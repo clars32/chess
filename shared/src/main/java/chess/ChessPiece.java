@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import chess.piecemoves.BishopMovesCalculator;
+import chess.piecemoves.KingMovesCalculator;
 import chess.piecemoves.PieceMovesCalculator;
 import chess.piecemoves.QueenMovesCalculator;
 import chess.piecemoves.RookMovesCalculator;
@@ -43,6 +44,7 @@ public class ChessPiece {
             case BISHOP: return new BishopMovesCalculator();
             case ROOK: return new RookMovesCalculator();
             case QUEEN: return new QueenMovesCalculator();
+            case KING: return new KingMovesCalculator();
             default: return (board, pos) -> List.of();
         }
     }
