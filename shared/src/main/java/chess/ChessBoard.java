@@ -13,6 +13,7 @@ import chess.ChessPiece.PieceType;
 public class ChessBoard {
 
     ChessPiece[][] squares = new ChessPiece[8][8];
+    
     public ChessBoard() {
         
     }
