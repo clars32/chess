@@ -42,6 +42,7 @@ public class ChessPiece {
             case QUEEN: return new QueenMovesCalculator();
             case KING: return new KingMovesCalculator();
             case KNIGHT: return new KnightMovesCalculator();
+            case PAWN: return new PawnMovesCalculator();
             default: return (board, pos) -> List.of();
         }
     }
