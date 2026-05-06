@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.List;
 
 import chess.piecemoves.BishopMovesCalculator;
+import chess.piecemoves.PieceMovesCalculator;
+import chess.piecemoves.RookMovesCalculator;
 
 /**
  * Represents a single chess piece
@@ -15,10 +17,12 @@ public class ChessPiece {
 
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
+    private final PieceMovesCalculator movesCalculator;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+        this.movesCalculator = initializeCalculator(type);
     }
 
     /**
@@ -31,6 +35,14 @@ public class ChessPiece {
         KNIGHT,
         ROOK,
         PAWN
+    }
+
+    private PieceMovesCalculator initializeCalculator(PieceType type) {
+        switch (type) {
+            case BISHOP: return new BishopMovesCalculator();
+            case ROOK: return new RookMovesCalculator();
+            default: return (board, pos) -> List.of();
+        }
     }
 
     /**
@@ -55,11 +67,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        ChessPiece piece = board.getPiece(myPosition);
-        if (piece.getPieceType() == PieceType.BISHOP) {
-            return new BishopMovesCalculator().pieceMoves(board, myPosition);
-        }
-        return List.of();
+        return movesCalculator.pieceMoves(board, myPosition);
     }
 
     @Override
