@@ -36,13 +36,13 @@ public class ChessPiece {
 
     private PieceMovesCalculator initializeCalculator(PieceType type) {
         switch (type) {
-            case BISHOP: return new BishopMovesCalculator();
-            case ROOK: return new RookMovesCalculator();
-            case QUEEN: return new QueenMovesCalculator();
             case KING: return new KingMovesCalculator();
+            case QUEEN: return new QueenMovesCalculator();
+            case ROOK: return new RookMovesCalculator();
+            case BISHOP: return new BishopMovesCalculator();
             case KNIGHT: return new KnightMovesCalculator();
             case PAWN: return new PawnMovesCalculator();
-            default: return (board, pos) -> List.of();
+            default: throw new IllegalArgumentException("Unknown piece type: " + type);
         }
     }
 

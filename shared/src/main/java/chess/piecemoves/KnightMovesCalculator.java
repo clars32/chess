@@ -1,12 +1,10 @@
 package chess.piecemoves;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import chess.ChessBoard;
 import chess.ChessMove;
 import chess.ChessPosition;
-import chess.ChessPiece;
 
 public class KnightMovesCalculator implements PieceMovesCalculator{
 

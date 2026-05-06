@@ -60,8 +60,6 @@ public class ChessGame {
 
         Collection<ChessMove> pieceMoves = currentPiece.pieceMoves(gameBoard, startPosition);
 
-        ArrayList<ChessMove> validMoves = new ArrayList<ChessMove>();
-
         return pieceMoves;
 
     }
@@ -145,6 +143,45 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return gameBoard;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((teamTurn == null) ? 0 : teamTurn.hashCode());
+        result = prime * result + ((gameBoard == null) ? 0 : gameBoard.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        ChessGame other = (ChessGame) obj;
+        if (teamTurn != other.teamTurn) {
+            return false;
+        }
+        if (gameBoard == null) {
+            if (other.gameBoard != null) {
+                return false;
+            }
+        } else if (!gameBoard.equals(other.gameBoard)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "ChessGame [teamTurn=" + teamTurn + ", gameBoard=" + gameBoard + "]";
     }
 
 }
