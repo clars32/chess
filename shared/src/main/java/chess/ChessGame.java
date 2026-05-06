@@ -43,6 +43,19 @@ public class ChessGame {
         BLACK
     }
 
+    private ChessBoard duplicateBoard(ChessBoard currentBoard) {
+        ChessBoard newBoard = new ChessBoard();
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPiece pieceAtPosition = currentBoard.getPiece(new ChessPosition(i, j));
+                if (pieceAtPosition != null) {
+                    newBoard.addPiece(new ChessPosition(i, j), new ChessPiece(pieceAtPosition.getTeamColor(), pieceAtPosition.getPieceType()));
+                }
+            }
+        }
+        return newBoard;
+    }
+
     /**
      * Gets all valid moves for a piece at the given location
      *
