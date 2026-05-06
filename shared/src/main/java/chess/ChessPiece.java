@@ -3,11 +3,7 @@ package chess;
 import java.util.Collection;
 import java.util.List;
 
-import chess.piecemoves.BishopMovesCalculator;
-import chess.piecemoves.KingMovesCalculator;
-import chess.piecemoves.PieceMovesCalculator;
-import chess.piecemoves.QueenMovesCalculator;
-import chess.piecemoves.RookMovesCalculator;
+import chess.piecemoves.*;
 
 /**
  * Represents a single chess piece
@@ -45,6 +41,7 @@ public class ChessPiece {
             case ROOK: return new RookMovesCalculator();
             case QUEEN: return new QueenMovesCalculator();
             case KING: return new KingMovesCalculator();
+            case KNIGHT: return new KnightMovesCalculator();
             default: return (board, pos) -> List.of();
         }
     }
