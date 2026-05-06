@@ -1,6 +1,8 @@
 package chess;
 
 import java.util.Arrays;
+import chess.ChessGame.TeamColor;
+import chess.ChessPiece.PieceType;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -41,7 +43,42 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        
+
+        squares = new ChessPiece[8][8];
+
+        // Set the pawns
+        for (int i = 0; i <= 7; i++) {
+            squares[1][i] = new ChessPiece(TeamColor.WHITE, PieceType.PAWN);
+            squares[6][i] = new ChessPiece(TeamColor.BLACK, PieceType.PAWN);
+        }
+
+        // Set the rooks
+        squares[0][0] = new ChessPiece(TeamColor.WHITE, PieceType.ROOK);
+        squares[0][7] = new ChessPiece(TeamColor.WHITE, PieceType.ROOK);
+        squares[7][0] = new ChessPiece(TeamColor.BLACK, PieceType.ROOK);
+        squares[7][7] = new ChessPiece(TeamColor.BLACK, PieceType.ROOK);
+
+        // Set the knights
+        squares[0][1] = new ChessPiece(TeamColor.WHITE, PieceType.KNIGHT);
+        squares[0][6] = new ChessPiece(TeamColor.WHITE, PieceType.KNIGHT);
+        squares[7][1] = new ChessPiece(TeamColor.BLACK, PieceType.KNIGHT);
+        squares[7][6] = new ChessPiece(TeamColor.BLACK, PieceType.KNIGHT);
+
+        // Set the bishops
+        squares[0][2] = new ChessPiece(TeamColor.WHITE, PieceType.BISHOP);
+        squares[0][5] = new ChessPiece(TeamColor.WHITE, PieceType.BISHOP);
+        squares[7][2] = new ChessPiece(TeamColor.BLACK, PieceType.BISHOP);
+        squares[7][5] = new ChessPiece(TeamColor.BLACK, PieceType.BISHOP);
+
+        // Set the queens
+        squares[0][3] = new ChessPiece(TeamColor.WHITE, PieceType.QUEEN);
+        squares[7][3] = new ChessPiece(TeamColor.BLACK, PieceType.QUEEN);
+
+        // Set the kings
+        squares[0][4] = new ChessPiece(TeamColor.WHITE, PieceType.KING);
+        squares[7][4] = new ChessPiece(TeamColor.BLACK, PieceType.KING);
+
     }
 
     @Override
