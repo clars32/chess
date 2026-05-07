@@ -15,11 +15,7 @@ public class ChessGame {
 
     private ChessBoard gameBoard = new ChessBoard();
 
-    private boolean whiteCanCastleKingside = true;
-    private boolean whiteCanCastleQueenside = true;
-    private boolean blackCanCastleKingside = true;
-    private boolean blackCanCastleQueenside = true;
-
+    private final CastlingRights castlingRights = new CastlingRights();
     private final EnPassantState enPassantState = new EnPassantState();
 
     public ChessGame() {
@@ -152,7 +148,7 @@ public class ChessGame {
 
         applyMoveToBoard(gameBoard, move, pieceToMove);
 
-        updateCastlingRights(pieceToMove, startPosition, endPosition, capturedPiece);
+        castlingRights.update(pieceToMove, startPosition, endPosition, capturedPiece);
         enPassantState.update(pieceToMove, startPosition, endPosition);
 
         TeamColor nextTurn = getTeamTurn() == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
@@ -187,7 +183,7 @@ public class ChessGame {
         int row = homeRow(teamColor);
         int rookColumn = kingside ? 8 : 1;
 
-        if (!hasCastlingRight(teamColor, kingside)) {
+        if (!castlingRights.hasRight(teamColor, kingside)) {
             return false;
         }
 
@@ -212,16 +208,6 @@ public class ChessGame {
         }
 
         return true;
-
-    }
-
-    private boolean hasCastlingRight(TeamColor teamColor, boolean kingside) {
-
-        if (teamColor == TeamColor.WHITE) {
-            return kingside ? whiteCanCastleKingside : whiteCanCastleQueenside;
-        } else {
-            return kingside ? blackCanCastleKingside : blackCanCastleQueenside;
-        }
 
     }
 
@@ -254,56 +240,6 @@ public class ChessGame {
         board.addPiece(startPosition, null);
         board.addPiece(rookEnd, rook);
         board.addPiece(rookStart, null);
-
-    }
-
-    private void updateCastlingRights(ChessPiece movedPiece, ChessPosition startPosition, ChessPosition endPosition, ChessPiece capturedPiece) {
-
-        if (movedPiece.getPieceType() == ChessPiece.PieceType.KING) {
-            disableKingCastlingRight(movedPiece.getTeamColor());
-        }
-
-        if (movedPiece.getPieceType() == ChessPiece.PieceType.ROOK) {
-            disableRookCastlingRight(movedPiece.getTeamColor(), startPosition);
-        }
-
-        if (capturedPiece != null && capturedPiece.getPieceType() == ChessPiece.PieceType.ROOK) {
-            disableRookCastlingRight(capturedPiece.getTeamColor(), endPosition);
-        }
-
-    }
-
-    private void disableKingCastlingRight(TeamColor teamColor) {
-
-        if (teamColor == TeamColor.WHITE) {
-            whiteCanCastleKingside = false;
-            whiteCanCastleQueenside = false;
-        } else {
-            blackCanCastleKingside = false;
-            blackCanCastleQueenside = false;
-        }
-
-    }
-
-    private void disableRookCastlingRight(TeamColor teamColor, ChessPosition rookPosition) {
-
-        if (rookPosition.getRow() != homeRow(teamColor)) {
-            return;
-        }
-
-        if (teamColor == TeamColor.WHITE) {
-            if (rookPosition.getColumn() == 1) {
-                whiteCanCastleQueenside = false;
-            } else if (rookPosition.getColumn() == 8) {
-                whiteCanCastleKingside = false;
-            }
-        } else {
-            if (rookPosition.getColumn() == 1) {
-                blackCanCastleQueenside = false;
-            } else if (rookPosition.getColumn() == 8) {
-                blackCanCastleKingside = false;
-            }
-        }
 
     }
 
@@ -446,10 +382,7 @@ public class ChessGame {
         int result = 1;
         result = prime * result + ((teamTurn == null) ? 0 : teamTurn.hashCode());
         result = prime * result + ((gameBoard == null) ? 0 : gameBoard.hashCode());
-        result = prime * result + (whiteCanCastleKingside ? 1231 : 1237);
-        result = prime * result + (whiteCanCastleQueenside ? 1231 : 1237);
-        result = prime * result + (blackCanCastleKingside ? 1231 : 1237);
-        result = prime * result + (blackCanCastleQueenside ? 1231 : 1237);
+        result = prime * result + castlingRights.hashCode();
         result = prime * result + enPassantState.hashCode();
         return result;
     }
@@ -476,16 +409,7 @@ public class ChessGame {
         } else if (!gameBoard.equals(other.gameBoard)) {
             return false;
         }
-        if (whiteCanCastleKingside != other.whiteCanCastleKingside) {
-            return false;
-        }
-        if (whiteCanCastleQueenside != other.whiteCanCastleQueenside) {
-            return false;
-        }
-        if (blackCanCastleKingside != other.blackCanCastleKingside) {
-            return false;
-        }
-        if (blackCanCastleQueenside != other.blackCanCastleQueenside) {
+        if (!castlingRights.equals(other.castlingRights)) {
             return false;
         }
         if (!enPassantState.equals(other.enPassantState)) {
@@ -496,10 +420,8 @@ public class ChessGame {
 
     @Override
     public String toString() {
-        return "ChessGame [teamTurn=" + teamTurn + ", gameBoard=" + gameBoard + ", whiteCanCastleKingside="
-                + whiteCanCastleKingside + ", whiteCanCastleQueenside=" + whiteCanCastleQueenside
-                + ", blackCanCastleKingside=" + blackCanCastleKingside + ", blackCanCastleQueenside="
-                + blackCanCastleQueenside + ", enPassantState=" + enPassantState + "]";
+        return "ChessGame [teamTurn=" + teamTurn + ", gameBoard=" + gameBoard + ", castlingRights=" + castlingRights
+                + ", enPassantState=" + enPassantState + "]";
     }
 
 }
