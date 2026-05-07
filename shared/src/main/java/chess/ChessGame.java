@@ -119,6 +119,24 @@ public class ChessGame {
         throw new RuntimeException("Not implemented");
     }
 
+    private ChessPosition findKingPosition(TeamColor teamColor) {
+        
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition positionToCheck = new ChessPosition(row, col);
+                ChessPiece pieceToCheck = gameBoard.getPiece(positionToCheck);
+                if (pieceToCheck != null
+                    && pieceToCheck.getPieceType() == ChessPiece.PieceType.KING
+                    && pieceToCheck.getTeamColor() == teamColor) {
+                        return positionToCheck;
+                }
+            }
+        }
+
+        return null;
+        
+    }
+
     /**
      * Determines if the given team is in checkmate
      *
