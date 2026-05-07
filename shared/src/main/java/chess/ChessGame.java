@@ -15,6 +15,11 @@ public class ChessGame {
 
     private ChessBoard gameBoard = new ChessBoard();
 
+    private boolean whiteCanCastleKingside = true;
+    private boolean whiteCanCastleQueenside = true;
+    private boolean blackCanCastleKingside = true;
+    private boolean blackCanCastleQueenside = true;
+
     public ChessGame() {
         gameBoard.resetBoard();
     }
@@ -95,6 +100,10 @@ public class ChessGame {
 
         }
 
+        if (currentPiece.getPieceType() == ChessPiece.PieceType.KING) {
+            addCastlingMoves(validMoves, currentPiece.getTeamColor(), startPosition);
+        }
+
         return validMoves;
 
     }
@@ -112,19 +121,27 @@ public class ChessGame {
         ChessPiece.PieceType promotionPiece = move.getPromotionPiece();
 
         ChessPiece pieceToMove = gameBoard.getPiece(startPosition);
+        Collection<ChessMove> legalMoves = validMoves(startPosition);
 
-        if ((validMoves(startPosition) == null) || // There are no valid moves
-        (!validMoves(startPosition).contains(move)) || // Requested move is invalid
-        (pieceToMove.getTeamColor() != teamTurn)) { // Not your turn
+        if (pieceToMove == null || legalMoves == null || 
+            !legalMoves.contains(move) || pieceToMove.getTeamColor() != teamTurn) {
             throw new InvalidMoveException();
         }
 
-        if (promotionPiece == null) {
+        ChessPiece capturedPiece = gameBoard.getPiece(endPosition);
+
+        if (isCastlingMove(pieceToMove, startPosition, endPosition)) {
+            makeCastlingMove(startPosition, endPosition, pieceToMove);
+        }
+        else if (promotionPiece == null) {
             gameBoard.addPiece(endPosition, pieceToMove);
+            gameBoard.addPiece(startPosition, null);
         } else {
             gameBoard.addPiece(endPosition, new ChessPiece(teamTurn, promotionPiece));
+            gameBoard.addPiece(startPosition, null);
         }
-        gameBoard.addPiece(startPosition, null);
+
+        updateCastlingRights(pieceToMove, startPosition, endPosition, capturedPiece);
 
         TeamColor nextTurn = getTeamTurn() == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
         setTeamTurn(nextTurn);
