@@ -148,6 +148,153 @@ public class ChessGame {
 
     }
 
+    private int homeRow(TeamColor teamColor) {
+        return teamColor == TeamColor.WHITE ? 1 : 8;
+    }
+
+    private void addCastlingMoves(Collection<ChessMove> validMoves, TeamColor teamColor, ChessPosition kingPosition) {
+
+        int homeRow = homeRow(teamColor);
+
+        if (kingPosition.getRow() != homeRow || kingPosition.getColumn() != 5) {
+            return;
+        }
+
+        if (canCastle(teamColor, false)) {
+            validMoves.add(new ChessMove(kingPosition, new ChessPosition(homeRow, 3), null));
+        }
+
+        if (canCastle(teamColor, true)) {
+            validMoves.add(new ChessMove(kingPosition, new ChessPosition(homeRow, 7), null));
+        }
+
+    }
+
+    private boolean canCastle(TeamColor teamColor, boolean kingside) {
+
+        int row = homeRow(teamColor);
+        int rookColumn = kingside ? 8 : 1;
+
+        if (!hasCastlingRight(teamColor, kingside)) {
+            return false;
+        }
+
+        if (!hasPiece(new ChessPosition(row, 5), teamColor, ChessPiece.PieceType.KING) ||
+            !hasPiece(new ChessPosition(row, rookColumn), teamColor, ChessPiece.PieceType.ROOK)) {
+                return false;
+        }
+
+        int firstEmptyColumn = kingside ? 6 : 2;
+        int lastEmptyColumn = kingside ? 7 : 4;
+        for (int col = firstEmptyColumn; col <= lastEmptyColumn; col++) {
+            if (gameBoard.getPiece(new ChessPosition(row, col)) != null) {
+                return false;
+            }
+        }
+
+        int direction = kingside ? 1 : -1;
+        for (int col = 5; col != 5 + (3 * direction); col += direction) {
+            if (isSquareUnderAttack(new ChessPosition(row, col), teamColor)) {
+                return false;
+            }
+        }
+
+        return true;
+
+    }
+
+    private boolean hasCastlingRight(TeamColor teamColor, boolean kingside) {
+
+        if (teamColor == TeamColor.WHITE) {
+            return kingside ? whiteCanCastleKingside : whiteCanCastleQueenside;
+        } else {
+            return kingside ? blackCanCastleKingside : blackCanCastleQueenside;
+        }
+
+    }
+
+    private boolean hasPiece(ChessPosition position, TeamColor teamColor, ChessPiece.PieceType pieceType) {
+        
+        ChessPiece piece = gameBoard.getPiece(position);
+        return piece != null && piece.getTeamColor() == teamColor && piece.getPieceType() == pieceType;
+    
+    }
+
+    private boolean isCastlingMove(ChessPiece pieceToMove, ChessPosition startPosition, ChessPosition endPosition) {
+        
+        return pieceToMove.getPieceType() == ChessPiece.PieceType.KING &&
+            startPosition.getRow() == endPosition.getRow() &&
+            startPosition.getColumn() == 5 &&
+            Math.abs(endPosition.getColumn() - startPosition.getColumn()) == 2;
+
+    }
+
+    private void makeCastlingMove(ChessPosition startPosition, ChessPosition endPosition, ChessPiece king) {
+
+        int row = startPosition.getRow();
+        boolean kingside = endPosition.getColumn() > startPosition.getColumn();
+
+        ChessPosition rookStart = new ChessPosition(row, kingside ? 8 : 1);
+        ChessPosition rookEnd = new ChessPosition(row, kingside ? 6 : 4);
+        ChessPiece rook = gameBoard.getPiece(rookStart);
+
+        gameBoard.addPiece(endPosition, king);
+        gameBoard.addPiece(startPosition, null);
+        gameBoard.addPiece(rookEnd, rook);
+        gameBoard.addPiece(rookStart, null);
+
+    }
+
+    private void updateCastlingRights(ChessPiece movedPiece, ChessPosition startPosition, ChessPosition endPosition, ChessPiece capturedPiece) {
+
+        if (movedPiece.getPieceType() == ChessPiece.PieceType.KING) {
+            disableKingCastlingRight(movedPiece.getTeamColor());
+        }
+
+        if (movedPiece.getPieceType() == ChessPiece.PieceType.ROOK) {
+            disableRookCastlingRight(movedPiece.getTeamColor(), startPosition);
+        }
+
+        if (capturedPiece != null && capturedPiece.getPieceType() == ChessPiece.PieceType.ROOK) {
+            disableRookCastlingRight(capturedPiece.getTeamColor(), endPosition);
+        }
+
+    }
+
+    private void disableKingCastlingRight(TeamColor teamColor) {
+
+        if (teamColor == TeamColor.WHITE) {
+            whiteCanCastleKingside = false;
+            whiteCanCastleQueenside = false;
+        } else {
+            blackCanCastleKingside = false;
+            blackCanCastleQueenside = false;
+        }
+
+    }
+
+    private void disableRookCastlingRight(TeamColor teamColor, ChessPosition rookPosition) {
+
+        if (rookPosition.getRow() != homeRow(teamColor)) {
+            return;
+        }
+
+        if (teamColor == TeamColor.WHITE) {
+            if (rookPosition.getColumn() == 1) {
+                whiteCanCastleQueenside = false;
+            } else if (rookPosition.getColumn() == 8) {
+                whiteCanCastleKingside = false;
+            }
+        } else {
+            if (rookPosition.getColumn() == 1) {
+                blackCanCastleQueenside = false;
+            } else if (rookPosition.getColumn() == 8) {
+                blackCanCastleKingside = false;
+            }
+        }
+
+    }
+
     /**
      * Determines if the given team is in check
      *
