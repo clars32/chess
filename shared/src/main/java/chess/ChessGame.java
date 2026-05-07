@@ -94,6 +94,10 @@ public class ChessGame {
 
             applyMoveToBoard(nextMoveBoard, move, currentPiece);
 
+            if (!nextMoveGame.isInCheck(currentPiece.getTeamColor())) {
+                validMoves.add(move);
+            }
+
         }
 
         if (currentPiece.getPieceType() == ChessPiece.PieceType.KING) {
@@ -495,7 +499,7 @@ public class ChessGame {
         return "ChessGame [teamTurn=" + teamTurn + ", gameBoard=" + gameBoard + ", whiteCanCastleKingside="
                 + whiteCanCastleKingside + ", whiteCanCastleQueenside=" + whiteCanCastleQueenside
                 + ", blackCanCastleKingside=" + blackCanCastleKingside + ", blackCanCastleQueenside="
-                + blackCanCastleQueenside + ", enPassantState=" + enPassantState;
+                + blackCanCastleQueenside + ", enPassantState=" + enPassantState + "]";
     }
 
 }
