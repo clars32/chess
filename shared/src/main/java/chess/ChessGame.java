@@ -73,7 +73,29 @@ public class ChessGame {
 
         Collection<ChessMove> pieceMoves = currentPiece.pieceMoves(gameBoard, startPosition);
 
-        return pieceMoves;
+        ArrayList<ChessMove> validMoves = new ArrayList<ChessMove>();
+
+        for (ChessMove move : pieceMoves) { // Only add moves that do not put the king in danger
+
+            ChessBoard nextMoveBoard = duplicateBoard(gameBoard);
+            ChessGame nextMoveGame = new ChessGame();
+            nextMoveGame.setBoard(nextMoveBoard);
+
+            // Make the move on the board, but skip validation to avoid circular dependency
+            if (move.getPromotionPiece() == null) {
+                nextMoveBoard.addPiece(move.getEndPosition(), nextMoveBoard.getPiece(startPosition));
+            } else {
+                nextMoveBoard.addPiece(move.getEndPosition(), new ChessPiece(currentPiece.getTeamColor(), move.getPromotionPiece()));
+            }
+            nextMoveBoard.addPiece(startPosition, null);
+
+            if (!nextMoveGame.isInCheck(currentPiece.getTeamColor())) {
+                validMoves.add(move);
+            }
+            
+        }
+
+        return validMoves;
 
     }
 
@@ -154,7 +176,7 @@ public class ChessGame {
         }
 
         return false;
-        
+
     }
 
     private boolean pieceAttacksSquare(ChessPosition startPosition, ChessPosition targetSquare) {
