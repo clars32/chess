@@ -351,6 +351,14 @@ public class ChessGame {
             return false;
         }
 
+        if (pieceToCheck.getPieceType() == ChessPiece.PieceType.PAWN) { // Make sure to check for pawn attacks!
+
+            int direction = pieceToCheck.getTeamColor() == TeamColor.WHITE ? 1 : -1;
+            return targetSquare.getRow() == startPosition.getRow() + direction &&
+                Math.abs(targetSquare.getColumn() - startPosition.getColumn()) == 1;
+
+        }
+
         Collection<ChessMove> possibleMoves = pieceToCheck.pieceMoves(gameBoard, startPosition);
         for (ChessMove move : possibleMoves) {
             if (move.getEndPosition().equals(targetSquare)) {
