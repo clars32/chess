@@ -134,6 +134,25 @@ public class ChessGame {
         }
 
         return null;
+
+    }
+
+    private boolean pieceAttacksSquare(ChessPosition startPosition, ChessPosition targetSquare) {
+
+        ChessPiece pieceToCheck = gameBoard.getPiece(startPosition);
+
+        if (pieceToCheck == null) {
+            return false;
+        }
+
+        Collection<ChessMove> possibleMoves = pieceToCheck.pieceMoves(gameBoard, startPosition);
+        for (ChessMove move : possibleMoves) {
+            if (move.getEndPosition().equals(targetSquare)) {
+                return true;
+            }
+        }
+
+        return false;
         
     }
 
