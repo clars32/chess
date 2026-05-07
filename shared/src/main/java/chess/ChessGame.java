@@ -93,17 +93,7 @@ public class ChessGame {
             ChessGame nextMoveGame = new ChessGame();
             nextMoveGame.setBoard(nextMoveBoard);
 
-            // Make the move on the board, but skip validation to avoid circular dependency
-            if (move.getPromotionPiece() == null) {
-                nextMoveBoard.addPiece(move.getEndPosition(), nextMoveBoard.getPiece(startPosition));
-            } else {
-                nextMoveBoard.addPiece(move.getEndPosition(), new ChessPiece(currentPiece.getTeamColor(), move.getPromotionPiece()));
-            }
-            nextMoveBoard.addPiece(startPosition, null);
-
-            if (!nextMoveGame.isInCheck(currentPiece.getTeamColor())) {
-                validMoves.add(move);
-            }
+            applyMoveToBoard(nextMoveBoard, move, currentPiece);
 
         }
 
@@ -314,10 +304,10 @@ public class ChessGame {
         ChessPosition rookEnd = new ChessPosition(row, kingside ? 6 : 4);
         ChessPiece rook = board.getPiece(rookStart);
 
-        gameBoard.addPiece(endPosition, king);
-        gameBoard.addPiece(startPosition, null);
-        gameBoard.addPiece(rookEnd, rook);
-        gameBoard.addPiece(rookStart, null);
+        board.addPiece(endPosition, king);
+        board.addPiece(startPosition, null);
+        board.addPiece(rookEnd, rook);
+        board.addPiece(rookStart, null);
 
     }
 
@@ -380,7 +370,7 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         
         ChessPosition kingPosition = findKingPosition(teamColor);
-        return kingPosition != null & isSquareUnderAttack(kingPosition, teamColor);
+        return kingPosition != null && isSquareUnderAttack(kingPosition, teamColor);
     }
 
     private ChessPosition findKingPosition(TeamColor teamColor) {
@@ -560,7 +550,7 @@ public class ChessGame {
                 return false;
             }
         } else if (!enPassantTargetPosition.equals(other.enPassantTargetPosition)) {
-
+            return false;
         }
         if (enPassantCapturedPawnPosition == null) {
             if (other.enPassantCapturedPawnPosition != null) {
