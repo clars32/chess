@@ -433,6 +433,10 @@ public class ChessGame {
         int result = 1;
         result = prime * result + ((teamTurn == null) ? 0 : teamTurn.hashCode());
         result = prime * result + ((gameBoard == null) ? 0 : gameBoard.hashCode());
+        result = prime * result + (whiteCanCastleKingside ? 1231 : 1237);
+        result = prime * result + (whiteCanCastleQueenside ? 1231 : 1237);
+        result = prime * result + (blackCanCastleKingside ? 1231 : 1237);
+        result = prime * result + (blackCanCastleQueenside ? 1231 : 1237);
         return result;
     }
 
@@ -458,12 +462,27 @@ public class ChessGame {
         } else if (!gameBoard.equals(other.gameBoard)) {
             return false;
         }
+        if (whiteCanCastleKingside != other.whiteCanCastleKingside) {
+            return false;
+        }
+        if (whiteCanCastleQueenside != other.whiteCanCastleQueenside) {
+            return false;
+        }
+        if (blackCanCastleKingside != other.blackCanCastleKingside) {
+            return false;
+        }
+        if (blackCanCastleQueenside != other.blackCanCastleQueenside) {
+            return false;
+        }
         return true;
     }
 
     @Override
     public String toString() {
-        return "ChessGame [teamTurn=" + teamTurn + ", gameBoard=" + gameBoard + "]";
+        return "ChessGame [teamTurn=" + teamTurn + ", gameBoard=" + gameBoard + ", whiteCanCastleKingside="
+                + whiteCanCastleKingside + ", whiteCanCastleQueenside=" + whiteCanCastleQueenside
+                + ", blackCanCastleKingside=" + blackCanCastleKingside + ", blackCanCastleQueenside="
+                + blackCanCastleQueenside + "]";
     }
 
 }
