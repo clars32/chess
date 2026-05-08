@@ -22,7 +22,6 @@ final class MoveGenerationUtils {
     }
 
     private static void addRayMoves(ChessBoard board, ChessPosition startPosition, ChessPiece currentPiece, 
-        
         Collection<ChessMove> validMoves, int rowDelta, int colDelta) {
 
         int nextRow = startPosition.getRow() + rowDelta;
