@@ -23,23 +23,23 @@ public class MemoryDataAccess implements DataAccess {
         nextGameId = 1;
     }
 
+    // register()
+
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUser'");
+        return users.get(username);
     }
 
     @Override
     public void createUser(UserData user) throws DataAccessException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createUser'");
+        users.put(user.username(), user);
     }
 
     @Override
     public void createAuth(AuthData auth) throws DataAccessException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createAuth'");
+        auths.put(auth.authToken(), auth);
     }
+    
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
