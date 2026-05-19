@@ -34,6 +34,13 @@ public class Server {
             ctx.status(200).result(gson.toJson(result));
         });
 
+        // login()
+        javalin.post("/session", ctx -> {
+            LoginRequest req = gson.fromJson(ctx.body(), LoginRequest.class);
+            LoginResult result = userService.login(req);
+            ctx.status(200).result(gson.toJson(result));
+        });
+
         // Handle any exceptions
         javalin.exception(BadRequestException.class, (e, ctx) -> {
             ctx.status(400).result(gson.toJson(Map.of("message", "Error: " + e.getMessage())));

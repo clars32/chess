@@ -33,4 +33,22 @@ public class UserService {
 
     }
 
+    public LoginResult login(LoginRequest req) throws DataAccessException {
+
+        if (req.username() == null || req.password() == null) {
+            throw new BadRequestException("bad request");
+        }
+
+        UserData user = dataAccess.getUser(req.username());
+        if (user == null || !user.password().equals(req.password())) {
+            throw new UnauthorizedException("unauthorized");
+        }
+
+        String token = UUID.randomUUID().toString();
+        dataAccess.createAuth(new AuthData(token, req.username()));
+
+        return new LoginResult(req.username(), token);
+        
+    }
+
 }
