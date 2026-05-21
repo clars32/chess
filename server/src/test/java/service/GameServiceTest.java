@@ -39,8 +39,28 @@ public class GameServiceTest {
 
     @Test
     void listGamesUnauthorizedThrows() {
+
         assertThrows(UnauthorizedException.class, () ->
             gameService.listGames("bad-token"));
+
+    }
+
+    @Test
+    void createGameSuccess() throws DataAccessException {
+
+        CreateGameResult result = gameService.createGame(token, new CreateGameRequest("my game"));
+
+        assertTrue(result.gameID() > 0);
+        assertEquals(1, dao.listGames().size());
+
+    }
+
+    @Test
+    void createGameUnauthorizedThrows() {
+
+        assertThrows(UnauthorizedException.class, () ->
+            gameService.createGame("bad-token", new CreateGameRequest("my game")));
+            
     }
     
 }
