@@ -4,6 +4,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import com.google.gson.Gson;
 
 import model.AuthData;
@@ -99,35 +101,61 @@ public class SQLDataAccess implements DataAccess {
         }
     }
 
-
-    @Override
-    public UserData getUser(String username) throws DataAccessException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUser'");
-    }
-
     @Override
     public void createUser(UserData user) throws DataAccessException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createUser'");
-    }
-
-    @Override
-    public AuthData getAuth(String authToken) throws DataAccessException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAuth'");
+        var sql = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
+        try (var conn = DatabaseManager.getConnection();
+            var ps = conn.prepareStatement(sql)) {
+                ps.setString(1, user.username());
+                ps.setString(2, BCrypt.hashpw(user.password(), BCrypt.gensalt()));
+                ps.setString(3, user.email());
+                ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("createUser failed", e);
+        }
     }
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteAuth'");
+        var sql = "DELETE FROM auth WHERE authToken=?";
+        try (var conn = DatabaseManager.getConnection();
+            var ps = conn.prepareStatement(sql)) {
+                ps.setString(1, authToken);
+                ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("deleteAuth failed", e);
+        }
     }
+
+    @Override
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        var sql = "SELECT authToken, username FROM auth WHERE authToken=?";
+        try (var conn = DatabaseManager.getConnection();
+            var ps = conn.prepareStatement(sql)) {
+                ps.setString(1, authToken);
+                var rs = ps.executeQuery();
+                if (rs.next()) {
+                    return new AuthData(rs.getString("authToken"),
+                                        rs.getString("username"));
+                }
+                return null;
+        } catch (SQLException e) {
+            throw new DataAccessException("getAuth failed", e);
+        }
+    }
+
+    
 
     @Override
     public Collection<GameData> listGames() throws DataAccessException {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'listGames'");
+    }
+
+    @Override
+    public UserData getUser(String username) throws DataAccessException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getUser'");
     }
 
     @Override
