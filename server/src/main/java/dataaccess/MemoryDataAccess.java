@@ -10,7 +10,7 @@ public class MemoryDataAccess implements DataAccess {
 
     private final Map<String, UserData> users = new HashMap<>();
     private final Map<String, AuthData> auths = new HashMap<>();
-    private final Map<String, GameData> games = new HashMap<>();
+    private final Map<Integer, GameData> games = new HashMap<>();
     private int nextGameId = 1;
 
     // clear()
@@ -59,10 +59,14 @@ public class MemoryDataAccess implements DataAccess {
         return games.values();
     }
 
+    // createGame()
+
     @Override
     public int createGame(GameData game) throws DataAccessException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createGame'");
+        int id = nextGameId++;
+        GameData withId = new GameData(id, game.whiteUserName(), game.blackUserName(), game.gameName(), game.game());
+        games.put(id, withId);
+        return id;
     }
 
     @Override

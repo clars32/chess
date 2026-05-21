@@ -1,7 +1,9 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
+import model.GameData;
 
 public class GameService {
     
@@ -22,4 +24,18 @@ public class GameService {
 
     }
     
+    public CreateGameResult createGame(String authToken, CreateGameRequest req) throws DataAccessException {
+
+        authService.verify(authToken);
+
+        if (req == null || req.gameName() == null) {
+            throw new BadRequestException("bad request");
+        }
+
+        GameData newGame = new GameData(0, null, null, req.gameName(), new ChessGame());
+        int gameID = dataAccess.createGame(newGame);
+
+        return new CreateGameResult(gameID);
+
+    }
 }
