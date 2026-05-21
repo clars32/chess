@@ -71,7 +71,7 @@ public class GameServiceTest {
         gameService.joinGame(token, new JoinGameRequest("WHITE", gameID));
 
         GameData game = dao.getGame(gameID);
-        assertEquals("carter", game.whiteUserName());
+        assertEquals("carter", game.whiteUsername());
 
     }
 

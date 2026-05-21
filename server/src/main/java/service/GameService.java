@@ -61,24 +61,24 @@ public class GameService {
 
         if (req.playerColor().equals("WHITE")) {
 
-            if (game.whiteUserName() != null) {
+            if (game.whiteUsername() != null) {
                 throw new AlreadyTakenException("already taken");
             }
 
-            updated = new GameData(game.gameID(), username, game.blackUserName(), game.gameName(), game.game());
+            updated = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
 
         } else {
 
-            if (game.blackUserName() != null) {
+            if (game.blackUsername() != null) {
                 throw new AlreadyTakenException("already taken");
             }
 
-            updated = new GameData(game.gameID(), game.whiteUserName(), username, game.gameName(), game.game());
+            updated = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
 
         }
 
         dataAccess.updateGame(updated);
 
     }
-    
+
 }
