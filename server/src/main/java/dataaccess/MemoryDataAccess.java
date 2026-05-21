@@ -26,17 +26,17 @@ public class MemoryDataAccess implements DataAccess {
     // register()
 
     @Override
-    public UserData getUser(String username) throws DataAccessException {
+    public UserData getUser(String username) {
         return users.get(username);
     }
 
     @Override
-    public void createUser(UserData user) throws DataAccessException {
+    public void createUser(UserData user) {
         users.put(user.username(), user);
     }
 
     @Override
-    public void createAuth(AuthData auth) throws DataAccessException {
+    public void createAuth(AuthData auth) {
         auths.put(auth.authToken(), auth);
     }
     
@@ -52,10 +52,11 @@ public class MemoryDataAccess implements DataAccess {
         auths.remove(authToken);
     }
 
+    // listGames()
+
     @Override
-    public Collection<GameData> listGames() throws DataAccessException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'listGames'");
+    public Collection<GameData> listGames() {
+        return games.values();
     }
 
     @Override

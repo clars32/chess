@@ -15,6 +15,7 @@ public class Server {
     private final ClearService clearService = new ClearService(dataAccess);
     private final UserService userService = new UserService(dataAccess);
     private final AuthService authService = new AuthService(dataAccess);
+    private final GameService gameService = new GameService(dataAccess, authService);
 
     private final Gson gson = new Gson();
 
@@ -47,6 +48,13 @@ public class Server {
             String authToken = ctx.header("authorization");
             authService.logout(authToken);
             ctx.status(200).result("{}");
+        });
+
+        // listGames()
+        javalin.get("/game", ctx -> {
+            String authToken = ctx.header("authorization");
+            ListGamesResult result = gameService.listGames(authToken);
+            ctx.status(200).result(gson.toJson(result));
         });
 
         // Handle any exceptions
