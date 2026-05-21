@@ -60,7 +60,33 @@ public class GameServiceTest {
 
         assertThrows(UnauthorizedException.class, () ->
             gameService.createGame("bad-token", new CreateGameRequest("my game")));
-            
+
+    }
+
+    @Test
+    void joinGameSucess() throws DataAccessException {
+
+        int gameID = gameService.createGame(token, new CreateGameRequest("my game")).gameID();
+
+        gameService.joinGame(token, new JoinGameRequest("WHITE", gameID));
+
+        GameData game = dao.getGame(gameID);
+        assertEquals("carter", game.whiteUserName());
+
+    }
+
+    @Test
+    void joinGameColorTakenThrows() throws DataAccessException {
+
+        int gameID = gameService.createGame(token, new CreateGameRequest("my game")).gameID();
+        gameService.joinGame(token, new JoinGameRequest("WHITE", gameID));
+
+        String token2 = userService.register(
+            new RegisterRequest("other", "pass", "othertest@test.com")).authToken();
+
+        assertThrows(AlreadyTakenException.class, () ->
+            gameService.joinGame(token2, new JoinGameRequest("WHITE", gameID)));
+
     }
     
 }
