@@ -40,17 +40,16 @@ public class MemoryDataAccess implements DataAccess {
         auths.put(auth.authToken(), auth);
     }
     
+    // logout()
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAuth'");
+        return auths.get(authToken);
     }
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteAuth'");
+        auths.remove(authToken);
     }
 
     @Override

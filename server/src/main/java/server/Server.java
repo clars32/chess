@@ -14,6 +14,7 @@ public class Server {
 
     private final ClearService clearService = new ClearService(dataAccess);
     private final UserService userService = new UserService(dataAccess);
+    private final AuthService authService = new AuthService(dataAccess);
 
     private final Gson gson = new Gson();
 
@@ -39,6 +40,13 @@ public class Server {
             LoginRequest req = gson.fromJson(ctx.body(), LoginRequest.class);
             LoginResult result = userService.login(req);
             ctx.status(200).result(gson.toJson(result));
+        });
+
+        // logout()
+        javalin.delete("/session", ctx -> {
+            String authToken = ctx.header("authorization");
+            authService.logout(authToken);
+            ctx.status(200).result("{}");
         });
 
         // Handle any exceptions
