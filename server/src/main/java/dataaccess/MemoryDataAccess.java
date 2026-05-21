@@ -43,12 +43,12 @@ public class MemoryDataAccess implements DataAccess {
     // logout()
 
     @Override
-    public AuthData getAuth(String authToken) throws DataAccessException {
+    public AuthData getAuth(String authToken) {
         return auths.get(authToken);
     }
 
     @Override
-    public void deleteAuth(String authToken) throws DataAccessException {
+    public void deleteAuth(String authToken) {
         auths.remove(authToken);
     }
 
@@ -62,23 +62,23 @@ public class MemoryDataAccess implements DataAccess {
     // createGame()
 
     @Override
-    public int createGame(GameData game) throws DataAccessException {
+    public int createGame(GameData game) {
         int id = nextGameId++;
         GameData withId = new GameData(id, game.whiteUserName(), game.blackUserName(), game.gameName(), game.game());
         games.put(id, withId);
         return id;
     }
 
+    // joinGame()
+
     @Override
-    public GameData getGame(int gameID) throws DataAccessException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getGame'");
+    public GameData getGame(int gameID) {
+        return games.get(gameID);
     }
 
     @Override
-    public void updateGame(GameData game) throws DataAccessException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateGame'");
+    public void updateGame(GameData game) {
+        games.put(game.gameID(), game);
     }
 
 }

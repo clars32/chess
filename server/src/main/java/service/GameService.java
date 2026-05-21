@@ -4,6 +4,7 @@ import chess.ChessGame;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import model.GameData;
+import model.AuthData;
 
 public class GameService {
     
@@ -17,6 +18,7 @@ public class GameService {
 
     }
 
+    // listGames()
     public ListGamesResult listGames(String authToken) throws DataAccessException {
 
         authService.verify(authToken);
@@ -24,6 +26,7 @@ public class GameService {
 
     }
     
+    // createGame()
     public CreateGameResult createGame(String authToken, CreateGameRequest req) throws DataAccessException {
 
         authService.verify(authToken);
@@ -38,4 +41,44 @@ public class GameService {
         return new CreateGameResult(gameID);
 
     }
+
+    // joinGame()
+    public void joinGame(String authToken, JoinGameRequest req) throws DataAccessException {
+
+        AuthData auth = authService.verify(authToken);
+
+        if (req == null || req.playerColor() == null || (!req.playerColor().equals("WHITE") && !req.playerColor().equals("BLACK"))) {
+            throw new BadRequestException("bad request");
+        }
+
+        GameData game = dataAccess.getGame(req.gameID());
+        if (game == null) {
+            throw new BadRequestException("bad request");
+        }
+
+        String username = auth.username();
+        GameData updated;
+
+        if (req.playerColor().equals("WHITE")) {
+
+            if (game.whiteUserName() != null) {
+                throw new AlreadyTakenException("already taken");
+            }
+
+            updated = new GameData(game.gameID(), username, game.blackUserName(), game.gameName(), game.game());
+
+        } else {
+
+            if (game.blackUserName() != null) {
+                throw new AlreadyTakenException("already taken");
+            }
+
+            updated = new GameData(game.gameID(), game.whiteUserName(), username, game.gameName(), game.game());
+
+        }
+
+        dataAccess.updateGame(updated);
+
+    }
+    
 }

@@ -65,6 +65,14 @@ public class Server {
             ctx.status(200).result(gson.toJson(result));
         });
 
+        // joinGame()
+        javalin.put("/game", ctx -> {
+            String authToken = ctx.header("authorization");
+            JoinGameRequest req = gson.fromJson(ctx.body(), JoinGameRequest.class);
+            gameService.joinGame(authToken, req);
+            ctx.status(200).result("{}");
+        });
+
         // Handle any exceptions
         javalin.exception(BadRequestException.class, (e, ctx) -> {
             ctx.status(400).result(gson.toJson(Map.of("message", "Error: " + e.getMessage())));
