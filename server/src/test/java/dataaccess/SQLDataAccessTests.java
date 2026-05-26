@@ -30,4 +30,20 @@ public class SQLDataAccessTests {
         assertNull(db.getUser("carter"));
         assertEquals(0, db.listGames().size());
     }
+
+    // createUser()
+
+    @Test
+    void createUserPositive() throws DataAccessException {
+        db.createUser(new UserData("carter", "pass", "test@test.com"));
+        assertNotNull(db.getUser("carter"));
+    }
+
+    @Test
+    void createUserDuplicate() throws DataAccessException {
+        db.createUser(new UserData("carter", "pass", "test@test.com"));
+        assertThrows(DataAccessException.class,
+            () -> db.createUser(new UserData("carter", "other", "test2@test.com")));
+    }
+    
 }
