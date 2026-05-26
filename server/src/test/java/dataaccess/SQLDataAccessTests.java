@@ -105,4 +105,18 @@ public class SQLDataAccessTests {
         assertDoesNotThrow(() -> db.deleteAuth("ghost"));
     }
 
+    // createGame()
+
+    @Test
+    void createGamePositive() throws DataAccessException {
+        int id = db.createGame(new GameData(0, null, null, "testGame", new ChessGame()));
+        assertTrue(id > 0);
+    }
+
+    @Test
+    void createGameNullName() {
+        assertThrows(DataAccessException.class,
+            () -> db.createGame(new GameData(0, null, null, null, new ChessGame())));
+    }
+
 }
