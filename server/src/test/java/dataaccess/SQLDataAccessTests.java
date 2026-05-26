@@ -58,5 +58,22 @@ public class SQLDataAccessTests {
     void getUserNotFound() throws DataAccessException {
         assertNull(db.getUser("nobody"));
     }
+
+    // createAuth()
+
+    @Test
+    void createAuthPositive() throws DataAccessException {
+        db.createUser(new UserData("carter", "pass", "test@test.com"));
+        db.createAuth(new AuthData("token123", "carter"));
+        assertNotNull(db.getAuth("token123"));
+    }
+
+    @Test
+    void createAuthDuplicate() throws DataAccessException {
+        db.createUser(new UserData("carter", "pass", "test@test.com"));
+        db.createAuth(new AuthData("token123", "carter"));
+        assertThrows(DataAccessException.class,
+            () -> db.createAuth(new AuthData("token123", "carter")));
+    }
     
 }
