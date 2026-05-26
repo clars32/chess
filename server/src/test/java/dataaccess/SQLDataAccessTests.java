@@ -132,4 +132,18 @@ public class SQLDataAccessTests {
         assertNull(db.getGame(99999));
     }
 
+    // listGames()
+
+    @Test
+    void listGamesPositive() throws DataAccessException {
+        db.createGame(new GameData(0, null, null, "game1", new ChessGame()));
+        db.createGame(new GameData(0, null, null, "game2", new ChessGame()));
+        assertEquals(2, db.listGames().size());
+    }
+
+    @Test
+    void listGamesEmpty() throws DataAccessException {
+        assertEquals(0, db.listGames().size());
+    }
+
 }
