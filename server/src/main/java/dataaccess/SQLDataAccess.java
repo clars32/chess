@@ -166,26 +166,54 @@ public class SQLDataAccess implements DataAccess {
         }
     }
 
-    
+    @Override
+    public UserData getUser(String username) throws DataAccessException {
+        var sql = "SELECT username, password, email FROM users WHERE username=?";
+        try (var conn = DatabaseManager.getConnection();
+            var ps = conn.prepareStatement(sql)) {
+                ps.setString(1, username);
+                var rs = ps.executeQuery();
+                if (rs.next()) {
+                    return new UserData(rs.getString("username"),
+                                        rs.getString("password"),
+                                        rs.getString("email"));
+                }
+                return null;
+        } catch (SQLException e) {
+            throw new DataAccessException("getUser failed", e);
+        }
+    }
 
     @Override
     public Collection<GameData> listGames() throws DataAccessException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'listGames'");
+        var result = new ArrayList<GameData>();
+        var sql = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games";
+        try (var conn = DatabaseManager.getConnection();
+            var ps = conn.prepareStatement(sql);
+            var rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    result.add(readGame(rs));
+                }
+        } catch (SQLException e) {
+            throw new DataAccessException("listGames failed", e);
+        }
+        return result;
     }
-
-    @Override
-    public UserData getUser(String username) throws DataAccessException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUser'");
-    }
-
-    
 
     @Override
     public void updateGame(GameData game) throws DataAccessException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateGame'");
+        var sql = "UPDATE games SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?";
+        try (var conn = DatabaseManager.getConnection();
+            var ps = conn.prepareStatement(sql)) {
+                ps.setString(1, game.whiteUsername());
+                ps.setString(2, game.blackUsername());
+                ps.setString(3, game.gameName());
+                ps.setString(4, gson.toJson(game.game()));
+                ps.setInt(5, game.gameID());
+                ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("updateGame failed", e);
+        }
     }
 
 }
