@@ -146,4 +146,19 @@ public class SQLDataAccessTests {
         assertEquals(0, db.listGames().size());
     }
 
+    // updateGame()
+
+    @Test
+    void updateGamePositive() throws DataAccessException {
+        int id = db.createGame(new GameData(0, null, null, "testGame", new ChessGame()));
+        db.updateGame(new GameData(id, "carter", null, "testGame", new ChessGame()));
+        assertEquals("carter", db.getGame(id).whiteUsername());
+    }
+
+    @Test
+    void updateGameNotFound() {
+        assertDoesNotThrow(() ->
+            db.updateGame(new GameData(99999, "carter", null, "ghost", new ChessGame())));
+    }
+
 }
