@@ -1,16 +1,12 @@
 package dataaccess;
 
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Collection;
-
+import java.sql.*;
+import chess.ChessGame;
 import org.mindrot.jbcrypt.BCrypt;
-
 import com.google.gson.Gson;
-
-import model.AuthData;
-import model.GameData;
-import model.UserData;
+import model.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class SQLDataAccess implements DataAccess {
     
@@ -55,6 +51,16 @@ public class SQLDataAccess implements DataAccess {
         } catch (SQLException e) {
             throw new DataAccessException("failed to create tables", e);
         }
+    }
+
+    private GameData readGame(ResultSet rs) throws SQLException {
+        return new GameData(
+            rs.getInt("gameID"),
+            rs.getString("whiteUsername"),
+            rs.getString("blackUsername"),
+            rs.getString("gameName"),
+            gson.fromJson(rs.getString("game"), ChessGame.class)
+        );
     }
 
     @Override
@@ -144,6 +150,22 @@ public class SQLDataAccess implements DataAccess {
         }
     }
 
+    @Override
+    public GameData getGame(int gameID) throws DataAccessException {
+        var sql = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games WHERE gameID=?";
+        try (var conn = DatabaseManager.getConnection();
+            var ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, gameID);
+                var rs = ps.executeQuery();
+                if (rs.next()) {
+                    return readGame(rs);
+                }
+                return null;
+        } catch (SQLException e) {
+            throw new DataAccessException("getGame failed", e);
+        }
+    }
+
     
 
     @Override
@@ -158,11 +180,7 @@ public class SQLDataAccess implements DataAccess {
         throw new UnsupportedOperationException("Unimplemented method 'getUser'");
     }
 
-    @Override
-    public GameData getGame(int gameID) throws DataAccessException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getGame'");
-    }
+    
 
     @Override
     public void updateGame(GameData game) throws DataAccessException {
