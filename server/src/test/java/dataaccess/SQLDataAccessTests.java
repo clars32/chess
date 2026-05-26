@@ -75,5 +75,19 @@ public class SQLDataAccessTests {
         assertThrows(DataAccessException.class,
             () -> db.createAuth(new AuthData("token123", "carter")));
     }
-    
+
+    // getAuth()
+
+    @Test
+    void getAuthExists() throws DataAccessException {
+        db.createUser(new UserData("carter", "pass", "test@test.com"));
+        db.createAuth(new AuthData("token123", "carter"));
+        assertEquals("carter", db.getAuth("token123").username());
+    }
+
+    @Test
+    void getAuthMissing() throws DataAccessException {
+        assertNull(db.getAuth("ghost"));
+    }
+
 }
