@@ -1,7 +1,8 @@
 package server;
 
 import dataaccess.DataAccess;
-import dataaccess.MemoryDataAccess;
+import dataaccess.DataAccessException;
+import dataaccess.SQLDataAccess;
 import service.*;
 import io.javalin.*;
 import com.google.gson.Gson;
@@ -10,16 +11,27 @@ import java.util.Map;
 public class Server {
 
     private final Javalin javalin;
-    private final DataAccess dataAccess = new MemoryDataAccess();
+    private final DataAccess dataAccess;
 
-    private final ClearService clearService = new ClearService(dataAccess);
-    private final UserService userService = new UserService(dataAccess);
-    private final AuthService authService = new AuthService(dataAccess);
-    private final GameService gameService = new GameService(dataAccess, authService);
+    private final ClearService clearService;
+    private final UserService userService;
+    private final AuthService authService;
+    private final GameService gameService;
 
     private final Gson gson = new Gson();
 
     public Server() {
+
+        try {
+            dataAccess = new SQLDataAccess();
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Failed to initialize database", e);
+        }
+
+        clearService = new ClearService(dataAccess);
+        userService = new UserService(dataAccess);
+        authService = new AuthService(dataAccess);
+        gameService = new GameService(dataAccess, authService);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
