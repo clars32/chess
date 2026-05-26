@@ -90,4 +90,19 @@ public class SQLDataAccessTests {
         assertNull(db.getAuth("ghost"));
     }
 
+    // deleteAuth()
+
+    @Test
+    void deleteAuthPositive() throws DataAccessException {
+        db.createUser(new UserData("carter", "pass", "test@test.com"));
+        db.createAuth(new AuthData("token123", "carter"));
+        db.deleteAuth("token123");
+        assertNull(db.getAuth("token123"));
+    }
+
+    @Test
+    void deleteAuthNonexistent() {
+        assertDoesNotThrow(() -> db.deleteAuth("ghost"));
+    }
+
 }
