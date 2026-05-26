@@ -119,4 +119,17 @@ public class SQLDataAccessTests {
             () -> db.createGame(new GameData(0, null, null, null, new ChessGame())));
     }
 
+    // getGame()
+
+    @Test
+    void getGamePositive() throws DataAccessException {
+        int id = db.createGame(new GameData(0, null, null, "testGame", new ChessGame()));
+        assertEquals("testGame", db.getGame(id).gameName());
+    }
+
+    @Test
+    void getGameNotFound() throws DataAccessException {
+        assertNull(db.getGame(99999));
+    }
+
 }
