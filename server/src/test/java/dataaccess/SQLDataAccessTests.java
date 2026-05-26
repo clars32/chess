@@ -45,5 +45,18 @@ public class SQLDataAccessTests {
         assertThrows(DataAccessException.class,
             () -> db.createUser(new UserData("carter", "other", "test2@test.com")));
     }
+
+    // getUser()
+    
+    @Test
+    void getUserExists() throws DataAccessException {
+        db.createUser(new UserData("carter", "pass", "test@test.com"));
+        assertEquals("carter", db.getUser("carter").username());
+    }
+
+    @Test
+    void getUserNotFound() throws DataAccessException {
+        assertNull(db.getUser("nobody"));
+    }
     
 }
