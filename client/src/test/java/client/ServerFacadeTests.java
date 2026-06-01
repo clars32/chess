@@ -125,7 +125,32 @@ public class ServerFacadeTests {
         );
 
         assertEquals(401, ex.statusCode());
+
+    }
+
+    // listGames()
+
+    @Test
+    void listGamesSuccess() throws Exception {
+
+        AuthData auth = facade.register("player1", "password", "p1@email.com");
+        facade.createGame(auth.authToken(), "game1");
+        facade.createGame(auth.authToken(), "game2");
+        Collection<GameData> games = facade.listGames(auth.authToken());
+
+        assertEquals(2, games.size());
+
+    }
+
+    @Test
+    void listGamesBadToken() {
+
+        ResponseException ex = assertThrows(ResponseException.class, () ->
+            facade.listGames("fake-token")
+        );
         
+        assertEquals(401, ex.statusCode());
+
     }
 
 }
