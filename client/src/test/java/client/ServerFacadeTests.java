@@ -80,6 +80,51 @@ public class ServerFacadeTests {
         );
 
         assertEquals(401, ex.statusCode());
+
+    }
+
+    // logout()
+
+    @Test
+    void logoutSuccess() throws Exception {
+
+        AuthData auth = facade.register("player1", "password", "p1@email.com");
+
+        assertDoesNotThrow(() -> facade.logout(auth.authToken()));
+
+    }
+
+    @Test
+    void logoutBadToken() {
+        
+        ResponseException ex = assertThrows(ResponseException.class, () ->
+            facade.logout("totally-fake-token")
+        );
+
+        assertEquals(401, ex.statusCode());
+
+    }
+
+    // createGame()
+
+    @Test
+    void createGameSuccess() throws Exception {
+
+        AuthData auth = facade.register("player1", "password", "p1@email.com");
+        int gameID = facade.createGame(auth.authToken(), "my game");
+
+        assertTrue(gameID > 0);
+
+    }
+
+    @Test
+    void createGameBadToken() {
+
+        ResponseException ex = assertThrows(ResponseException.class, () ->
+            facade.createGame("fake-token", "my game")
+        );
+
+        assertEquals(401, ex.statusCode());
         
     }
 
