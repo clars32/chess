@@ -181,4 +181,20 @@ public class ServerFacadeTests {
 
     }
 
+    // clear()
+
+    @Test
+    void clearRemovesUsers() throws Exception {
+
+        AuthData auth = facade.register("player1", "password", "p1@email.com");
+        String oldToken = auth.authToken();
+        facade.clear();
+        ResponseException ex = assertThrows(ResponseException.class, () ->
+            facade.listGames(oldToken)
+        );
+
+        assertEquals(401, ex.statusCode());
+        
+    }
+
 }
