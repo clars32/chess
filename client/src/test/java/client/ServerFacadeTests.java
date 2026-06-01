@@ -55,6 +55,32 @@ public class ServerFacadeTests {
         ResponseException ex = assertThrows(ResponseException.class, () ->
             facade.register("player1", "different", "other@email.com"));
         assertEquals(403, ex.statusCode());
+
+    }
+
+    // login()
+
+    @Test
+    void loginSuccess() throws Exception {
+
+        facade.register("player1", "password", "p1@email.com");
+        AuthData auth = facade.login("player1", "password");
+
+        assertNotNull(auth.authToken());
+        assertEquals("player1", auth.username());
+
+    }
+
+    @Test
+    void loginWrongPassword() throws Exception {
+
+        facade.register("player1", "password", "p1@email.com");
+        ResponseException ex = assertThrows(ResponseException.class, () ->
+            facade.login("player1", "wrongpassword")
+        );
+
+        assertEquals(401, ex.statusCode());
+        
     }
 
 }
