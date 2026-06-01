@@ -37,6 +37,40 @@ public class ServerFacade {
     private record CreateGameResult(int gameID) {}
     private record ListGamesResult(Collection<GameData> games) {}
 
+    public void clear() throws ResponseException {
+        makeRequest("DELETE", "/db", null, null, null);
+    }
+
+    public AuthData register(String username, String password, String email) throws ResponseException {
+        var body = new UserData(username, password, email);
+        return makeRequest("POST", "/user", body, null, AuthData.class);
+    }
+
+    public AuthData login(String username, String password) throws ResponseException {
+        var body = new LoginBody(username, password);
+        return makeRequest("POST", "/session", body, null, AuthData.class);
+    }
+
+    public void logout(String authToken) throws ResponseException {
+        makeRequest("DELETE", "/session", null, authToken, null);
+    }
+
+    public int createGame(String authToken, String gameName) throws ResponseException {
+        var body = new CreateGameBody(gameName);
+        var result = makeRequest("POST", "/game", body, authToken, CreateGameResult.class);
+        return result.gameID();
+    }
+
+    public Collection<GameData> listGames(String authToken) throws ResponseException {
+        var result = makeRequest("GET", "/game", null, authToken, ListGamesResult.class);
+        return result.games();
+    }
+
+    public void joinGame(String authToken, String playerColor, int gameID) throws ResponseException {
+        var body = new JoinGameBody(playerColor, gameID);
+        makeRequest("PUT", "/game", body, authToken, null);
+    }
+
     // private HTTP plumbing
 
     private<T> T makeRequest(String method, String path, Object requestBody,
