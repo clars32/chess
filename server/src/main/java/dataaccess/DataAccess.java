@@ -1,7 +1,8 @@
 package dataaccess;
 
-import model.*;
 import java.util.Collection;
+
+import model.*;
 
 public interface DataAccess {
     

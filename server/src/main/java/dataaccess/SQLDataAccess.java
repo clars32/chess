@@ -2,9 +2,11 @@ package dataaccess;
 
 import java.sql.*;
 import chess.ChessGame;
+import model.*;
+
 import org.mindrot.jbcrypt.BCrypt;
 import com.google.gson.Gson;
-import model.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 

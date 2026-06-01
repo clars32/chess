@@ -5,10 +5,15 @@ import java.net.URL;
 
 import com.google.gson.Gson;
 
+import model.AuthData;
+import model.GameData;
+import model.UserData;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.Collection;
 
 public class ServerFacade {
     
@@ -24,6 +29,13 @@ public class ServerFacade {
     }
 
     // public API
+
+    /// small local records for request bodies
+    private record LoginBody(String username, String password) {}
+    private record CreateGameBody(String gameName) {}
+    private record JoinGameBody(String playerColor, int gameID) {}
+    private record CreateGameResult(int gameID) {}
+    private record ListGamesResult(Collection<GameData> games) {}
 
     // private HTTP plumbing
 
