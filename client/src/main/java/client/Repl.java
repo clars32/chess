@@ -7,7 +7,7 @@ import static ui.EscapeSequences.*;
 public class Repl {
     
     private final PreloginClient preloginClient;
-    private final PostloginClient postliginClient;
+    private final PostloginClient postloginClient;
     private final Scanner scanner = new Scanner(System.in);
 
     private boolean loggedIn = false;
@@ -15,7 +15,8 @@ public class Repl {
 
     public Repl(String serverUrl) {
         ServerFacade facade = new ServerFacade(serverUrl);
-        preloginClient = new PreloginClient(facade, this)
+        preloginClient = new PreloginClient(facade, this);
+        postloginClient = new PostloginClient(facade, this);
     }
 
     public void run() {
@@ -51,5 +52,5 @@ public class Repl {
     void setRunning(boolean running) {
         this.running = running;
     }
-    
+
 }
