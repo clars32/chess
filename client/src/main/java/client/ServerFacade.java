@@ -121,7 +121,9 @@ public class ServerFacade {
     private String readError(HttpURLConnection http) {
 
         try (InputStream err = http.getErrorStream()) {
-            if (err == null) return "server returned status " + http.getResponseCode();
+            if (err == null) {
+                return "server returned status " + http.getResponseCode();
+            }
             var parsed = gson.fromJson(new InputStreamReader(err), java.util.Map.class);
             Object message = parsed != null ? parsed.get("message") : null;
             return message != null ? message.toString() : "unknown error";
