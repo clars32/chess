@@ -60,21 +60,21 @@ public class BoardRenderer {
 
     private static void drawColumnLabels(int colStart, int colEnd, int colStep) {
         
-        System.out.print(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_BLACK + "  ");
+        System.out.print(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_BLACK + "   ");
 
         for (int col = colStart; col != colEnd + colStep; col += colStep) {
             char letter = (char) ('a' + col - 1);
             System.out.print(" " + letter + " ");
         }
 
-        System.out.println("  " + RESET_BG_COLOR + RESET_TEXT_COLOR);
+        System.out.println("   " + RESET_BG_COLOR + RESET_TEXT_COLOR);
 
     }
 
     private static String getPieceString(ChessPiece piece) {
 
         if (piece == null) {
-            return "  ";
+            return "   ";
         }
 
         String textColor = (piece.getTeamColor() == ChessGame.TeamColor.WHITE)

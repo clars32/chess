@@ -113,7 +113,7 @@ public class PostloginClient {
                 ? ChessGame.TeamColor.WHITE
                 : ChessGame.TeamColor.BLACK;
         BoardRenderer.drawBoard(gameData.game(), perspective);
-        return "Joined game '" + gameData.gameName() + "'as " + color + ".";
+        return "Joined game '" + gameData.gameName() + " 'as " + color + ".";
     }
 
     private String observeGame(String[] tokens) {
@@ -134,7 +134,7 @@ public class PostloginClient {
 
         GameData gameData = lastGameList.get(gameNumber - 1);
         BoardRenderer.drawBoard(gameData.game(), ChessGame.TeamColor.WHITE);
-        return "Observing game '" + gameData.gameName() + "''.";
+        return "Observing game '" + gameData.gameName() + "'.";
     }
     
 }
