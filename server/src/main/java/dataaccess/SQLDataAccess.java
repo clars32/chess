@@ -12,7 +12,7 @@ import java.util.Collection;
 
 public class SQLDataAccess implements DataAccess {
     
-    private final Gson gson = new Gson();
+    private final Gson gson = GameGson.create();
 
     public SQLDataAccess() throws DataAccessException {
         DatabaseManager.createDatabase();
