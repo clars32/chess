@@ -1,6 +1,5 @@
 package dataaccess;
 
-import java.sql.*;
 import chess.ChessGame;
 import model.*;
 
@@ -9,6 +8,7 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.sql.*;
 
 public class SQLDataAccess implements DataAccess {
     
