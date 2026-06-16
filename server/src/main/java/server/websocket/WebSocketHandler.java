@@ -11,7 +11,6 @@ import io.javalin.websocket.WsConnectContext;
 import io.javalin.websocket.WsErrorContext;
 import io.javalin.websocket.WsMessageContext;
 import websocket.commands.UserGameCommand;
-import websocket.commands.MakeMoveCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -194,6 +193,14 @@ public class WebSocketHandler {
 
     private void resign(WsMessageContext ctx, UserGameCommand command) throws Exception {
         // To be filled in later
+    }
+
+    private static class MakeMoveCommand extends UserGameCommand {
+        private ChessMove move;
+
+        public ChessMove getMove() {
+            return move;
+        }
     }
 
     private void sendError(WsMessageContext ctx, String message) {
