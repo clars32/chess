@@ -2,16 +2,16 @@ package client;
 
 import chess.ChessGame;
 import model.GameData;
-import ui.BoardRenderer;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class PostloginClient {
-    
+
     private final ServerFacade facade;
     private final Repl repl;
+    private final GameplayClient gameplayClient;
 
     // Shared with PreloginClient - set on login/register
     static String authToken;
@@ -19,9 +19,10 @@ public class PostloginClient {
     // Cached game list so user can reference games by number
     private List<GameData> lastGameList = new ArrayList<>();
 
-    public PostloginClient(ServerFacade facade, Repl repl) {
+    public PostloginClient(ServerFacade facade, Repl repl, GameplayClient gameplayClient) {
         this.facade = facade;
         this.repl = repl;
+        this.gameplayClient = gameplayClient;
     }
 
     public String eval(String input) throws ResponseException {
@@ -107,16 +108,17 @@ public class PostloginClient {
         }
 
         GameData gameData = lastGameList.get(gameNumber - 1);
-        facade.joinGame(authToken, color, gameData.gameID());
-
         ChessGame.TeamColor perspective = color.equals("WHITE")
                 ? ChessGame.TeamColor.WHITE
                 : ChessGame.TeamColor.BLACK;
-        BoardRenderer.drawBoard(gameData.game(), perspective);
-        return "Joined game '" + gameData.gameName() + " 'as " + color + ".";
+
+        // Players join through the HTTP endpoint, then open the gameplay WebSocket
+        facade.joinGame(authToken, color, gameData.gameID());
+        gameplayClient.connect(authToken, gameData.gameID(), perspective);
+        return "Joining game '" + gameData.gameName() + "' as " + color + ".";
     }
 
-    private String observeGame(String[] tokens) {
+    private String observeGame(String[] tokens) throws ResponseException {
         if (tokens.length != 2) {
             return "Usage: observe <GAME_NUMBER>";
         }
@@ -133,8 +135,10 @@ public class PostloginClient {
         }
 
         GameData gameData = lastGameList.get(gameNumber - 1);
-        BoardRenderer.drawBoard(gameData.game(), ChessGame.TeamColor.WHITE);
+
+        // Observers do not call the join endpoint; they only open the gameplay WebSocket
+        gameplayClient.connect(authToken, gameData.gameID(), null);
         return "Observing game '" + gameData.gameName() + "'.";
     }
-    
+
 }

@@ -10,6 +10,7 @@ import io.javalin.websocket.WsCloseContext;
 import io.javalin.websocket.WsConnectContext;
 import io.javalin.websocket.WsErrorContext;
 import io.javalin.websocket.WsMessageContext;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
@@ -259,14 +260,6 @@ public class WebSocketHandler {
         String notification = "%s resigned the game.".formatted(username);
         connections.broadcast(gameData.gameID(), null, gson.toJson(new NotificationMessage(notification)));
 
-    }
-
-    private static class MakeMoveCommand extends UserGameCommand {
-        private ChessMove move;
-
-        public ChessMove getMove() {
-            return move;
-        }
     }
 
     private void sendError(WsMessageContext ctx, String message) {
