@@ -59,21 +59,39 @@ public class WebSocketHandler {
         // Nothing actionable to do for a transport-level error.
     }
 
-    private void connect(WsMessageContext ctx, UserGameCommand command) throws DataAccessException {
-        
+    /** The username and game a command refers to, once its auth token and gameID are validated. */
+    private record GameSession(String username, GameData gameData) {
+    }
+
+    /**
+     * Validates the command's auth token and gameID. On failure, sends an Error to the
+     * root client and returns {@code null}; otherwise returns the resolved session.
+     */
+    private GameSession authorize(WsMessageContext ctx, UserGameCommand command) throws DataAccessException {
         AuthData auth = dataAccess.getAuth(command.getAuthToken());
         if (auth == null) {
             sendError(ctx, "Error: invalid auth token");
-            return;
+            return null;
         }
 
-        GameData game = dataAccess.getGame(command.getGameID());
-        if (game == null) {
+        GameData gameData = dataAccess.getGame(command.getGameID());
+        if (gameData == null) {
             sendError(ctx, "Error: game not found");
+            return null;
+        }
+
+        return new GameSession(auth.username(), gameData);
+    }
+
+    private void connect(WsMessageContext ctx, UserGameCommand command) throws DataAccessException {
+
+        GameSession session = authorize(ctx, command);
+        if (session == null) {
             return;
         }
 
-        String username = auth.username();
+        String username = session.username();
+        GameData game = session.gameData();
         connections.add(game.gameID(), username, ctx);
 
         // LOAD_GAME goes only to the root client
@@ -99,19 +117,13 @@ public class WebSocketHandler {
 
     private void makeMove(WsMessageContext ctx, MakeMoveCommand command) throws DataAccessException {
 
-        AuthData auth = dataAccess.getAuth(command.getAuthToken());
-        if (auth == null) {
-            sendError(ctx, "Error: invalid auth token");
+        GameSession session = authorize(ctx, command);
+        if (session == null) {
             return;
         }
 
-        GameData gameData = dataAccess.getGame(command.getGameID());
-        if (gameData == null) {
-            sendError(ctx, "Error: game not found");
-            return;
-        }
-
-        String username = auth.username();
+        String username = session.username();
+        GameData gameData = session.gameData();
         ChessGame game = gameData.game();
 
         if (game.isGameOver()) {
@@ -193,19 +205,13 @@ public class WebSocketHandler {
 
     private void leave(WsMessageContext ctx, UserGameCommand command) throws DataAccessException {
 
-        AuthData auth = dataAccess.getAuth(command.getAuthToken());
-        if (auth == null) {
-            sendError(ctx, "Error: invalid auth token");
+        GameSession session = authorize(ctx, command);
+        if (session == null) {
             return;
         }
 
-        GameData gameData = dataAccess.getGame(command.getGameID());
-        if (gameData == null) {
-            sendError(ctx, "Error: game not found");
-            return;
-        }
-
-        String username = auth.username();
+        String username = session.username();
+        GameData gameData = session.gameData();
         int gameID = gameData.gameID();
 
         // If a player is leaving, remove them from the game and persist the change
@@ -229,19 +235,13 @@ public class WebSocketHandler {
 
     private void resign(WsMessageContext ctx, UserGameCommand command) throws DataAccessException {
 
-        AuthData auth = dataAccess.getAuth(command.getAuthToken());
-        if (auth == null) {
-            sendError(ctx, "Error: invalid auth token");
+        GameSession session = authorize(ctx, command);
+        if (session == null) {
             return;
         }
 
-        GameData gameData = dataAccess.getGame(command.getGameID());
-        if (gameData == null) {
-            sendError(ctx, "Error: game not found");
-            return;
-        }
-
-        String username = auth.username();
+        String username = session.username();
+        GameData gameData = session.gameData();
         ChessGame game = gameData.game();
 
         if (game.isGameOver()) {

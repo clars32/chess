@@ -26,7 +26,8 @@ public class UserService {
             throw new AlreadyTakenException("already taken");
         }
 
-        dataAccess.createUser(new UserData(req.username(), req.password(), req.email()));
+        String hashedPassword = BCrypt.hashpw(req.password(), BCrypt.gensalt());
+        dataAccess.createUser(new UserData(req.username(), hashedPassword, req.email()));
 
         String token = UUID.randomUUID().toString();
         dataAccess.createAuth(new AuthData(token, req.username()));

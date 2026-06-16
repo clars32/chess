@@ -29,6 +29,9 @@ public class Repl {
         while (running) {
             printPrompt();
 
+            if (!scanner.hasNextLine()) {
+                break;
+            }
             String input = scanner.nextLine().trim();
             if (input.isEmpty()) {
                 continue;

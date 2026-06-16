@@ -25,16 +25,6 @@ public class ConnectionManager {
         }
     }
 
-    public void sentTo(int gameID, String username, String message) {
-        ConcurrentHashMap<String, Connection> gameConnections = connections.get(gameID);
-        if (gameConnections != null) {
-            Connection connection = gameConnections.get(username);
-            if (connection != null) {
-                connection.send(message);
-            }
-        }
-    }
-
     public void broadcast(int gameID, String excludeUsername, String message) {
         ConcurrentHashMap<String, Connection> gameConnections = connections.get(gameID);
         if (gameConnections == null) {

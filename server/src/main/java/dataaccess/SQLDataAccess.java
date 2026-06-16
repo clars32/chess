@@ -3,7 +3,6 @@ package dataaccess;
 import chess.ChessGame;
 import model.*;
 
-import org.mindrot.jbcrypt.BCrypt;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -115,7 +114,7 @@ public class SQLDataAccess implements DataAccess {
         try (var conn = DatabaseManager.getConnection();
             var ps = conn.prepareStatement(sql)) {
                 ps.setString(1, user.username());
-                ps.setString(2, BCrypt.hashpw(user.password(), BCrypt.gensalt()));
+                ps.setString(2, user.password());
                 ps.setString(3, user.email());
                 ps.executeUpdate();
         } catch (SQLException e) {
