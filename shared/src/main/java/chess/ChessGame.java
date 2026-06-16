@@ -15,6 +15,8 @@ public class ChessGame {
 
     private ChessBoard gameBoard = new ChessBoard();
 
+    private boolean gameOver = false;
+
     private final CastlingRights castlingRights = new CastlingRights();
     private final EnPassantState enPassantState = new EnPassantState();
 
@@ -374,6 +376,14 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return gameBoard;
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
     }
 
     @Override
