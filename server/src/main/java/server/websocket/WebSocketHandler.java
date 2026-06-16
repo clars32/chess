@@ -2,13 +2,18 @@ package server.websocket;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import dataaccess.GameGson;
+import model.AuthData;
+import model.GameData;
 import io.javalin.websocket.WsCloseContext;
 import io.javalin.websocket.WsConnectContext;
 import io.javalin.websocket.WsErrorContext;
 import io.javalin.websocket.WsMessageContext;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 
 public class WebSocketHandler {
     
@@ -46,8 +51,42 @@ public class WebSocketHandler {
         // To be filled in later
     }
 
-    private void connect(WsMessageContext ctx, UserGameCommand command) throws Exception {
-        // To be filled in later
+    private void connect(WsMessageContext ctx, UserGameCommand command) throws DataAccessException {
+        
+        AuthData auth = dataAccess.getAuth(command.getAuthToken());
+        if (auth == null) {
+            sendError(ctx, "Error: invalid auth token");
+            return;
+        }
+
+        GameData game = dataAccess.getGame(command.getGameID());
+        if (game == null) {
+            sendError(ctx, "Error: game not found");
+            return;
+        }
+
+        String username = auth.username();
+        connections.add(game.gameID(), username, ctx);
+
+        // LOAD_GAME goes only to the root client
+        ctx.send(gson.toJson(new LoadGameMessage(game)));
+
+        // Everyone else already in the game hears that this user joined
+        String notification = "%s joined the game as %s.".formatted(username, connectRole(username, game));
+        connections.broadcast(game.gameID(), username, gson.toJson(new NotificationMessage(notification)));
+
+    }
+
+    private String connectRole(String username, GameData game) {
+
+        if (username.equals(game.whiteUsername())) {
+            return "white";
+        }
+        if (username.equals(game.blackUsername())) {
+            return "black";
+        }
+        return "an observer";
+        
     }
 
     private void makeMove(WsMessageContext ctx, UserGameCommand command) throws Exception {
