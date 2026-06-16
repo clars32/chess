@@ -11,7 +11,7 @@ public class GameGson {
     private GameGson() {
     }
 
-    static Gson create() {
+    public static Gson create() {
         return new GsonBuilder()
             .registerTypeAdapter(ChessPiece.class, new ChessPieceAdapter())
             .create();
