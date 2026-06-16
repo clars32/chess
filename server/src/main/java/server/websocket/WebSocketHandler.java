@@ -30,7 +30,8 @@ public class WebSocketHandler {
     }
 
     public void onConnect(WsConnectContext ctx) {
-        // To be filled in later
+        // A client is registered with the game once it sends its CONNECT command
+        // (handled in onMessage), since that is when its username and gameID are known.
     }
 
     public void onMessage(WsMessageContext ctx) {
@@ -48,11 +49,13 @@ public class WebSocketHandler {
     }
 
     public void onClose(WsCloseContext ctx) {
-        // To be filled in later
+        // Closed sessions are skipped by Connection.send (it checks isOpen), and a
+        // game's connection is explicitly removed when the client sends LEAVE, so no
+        // additional cleanup is required here.
     }
 
     public void onError(WsErrorContext ctx) {
-        // To be filled in later
+        // Nothing actionable to do for a transport-level error.
     }
 
     private void connect(WsMessageContext ctx, UserGameCommand command) throws DataAccessException {
@@ -187,12 +190,75 @@ public class WebSocketHandler {
         return "%c%d".formatted(file, position.getRow());
     }
 
-    private void leave(WsMessageContext ctx, UserGameCommand command) throws Exception {
-        // To be filled in later
+    private void leave(WsMessageContext ctx, UserGameCommand command) throws DataAccessException {
+
+        AuthData auth = dataAccess.getAuth(command.getAuthToken());
+        if (auth == null) {
+            sendError(ctx, "Error: invalid auth token");
+            return;
+        }
+
+        GameData gameData = dataAccess.getGame(command.getGameID());
+        if (gameData == null) {
+            sendError(ctx, "Error: game not found");
+            return;
+        }
+
+        String username = auth.username();
+        int gameID = gameData.gameID();
+
+        // If a player is leaving, remove them from the game and persist the change
+        ChessGame.TeamColor color = colorOf(username, gameData);
+        if (color != null) {
+            dataAccess.updateGame(removePlayer(gameData, color));
+        }
+
+        // Tell everyone else the root client left, then stop tracking this connection
+        String notification = "%s left the game.".formatted(username);
+        connections.broadcast(gameID, username, gson.toJson(new NotificationMessage(notification)));
+        connections.remove(gameID, username);
+
     }
 
-    private void resign(WsMessageContext ctx, UserGameCommand command) throws Exception {
-        // To be filled in later
+    private GameData removePlayer(GameData gameData, ChessGame.TeamColor color) {
+        String white = color == ChessGame.TeamColor.WHITE ? null : gameData.whiteUsername();
+        String black = color == ChessGame.TeamColor.BLACK ? null : gameData.blackUsername();
+        return new GameData(gameData.gameID(), white, black, gameData.gameName(), gameData.game());
+    }
+
+    private void resign(WsMessageContext ctx, UserGameCommand command) throws DataAccessException {
+
+        AuthData auth = dataAccess.getAuth(command.getAuthToken());
+        if (auth == null) {
+            sendError(ctx, "Error: invalid auth token");
+            return;
+        }
+
+        GameData gameData = dataAccess.getGame(command.getGameID());
+        if (gameData == null) {
+            sendError(ctx, "Error: game not found");
+            return;
+        }
+
+        String username = auth.username();
+        ChessGame game = gameData.game();
+
+        if (game.isGameOver()) {
+            sendError(ctx, "Error: the game is already over");
+            return;
+        }
+
+        if (colorOf(username, gameData) == null) {
+            sendError(ctx, "Error: observers cannot resign");
+            return;
+        }
+
+        game.setGameOver(true);
+        dataAccess.updateGame(gameData);
+
+        String notification = "%s resigned the game.".formatted(username);
+        connections.broadcast(gameData.gameID(), null, gson.toJson(new NotificationMessage(notification)));
+
     }
 
     private static class MakeMoveCommand extends UserGameCommand {
