@@ -7,6 +7,7 @@ import service.*;
 import io.javalin.*;
 import com.google.gson.Gson;
 import java.util.Map;
+import server.websocket.WebSocketHandler;
 
 public class Server {
 
@@ -17,6 +18,7 @@ public class Server {
     private final UserService userService;
     private final AuthService authService;
     private final GameService gameService;
+    private final WebSocketHandler webSocketHandler;
 
     private final Gson gson = new Gson();
 
@@ -32,8 +34,17 @@ public class Server {
         userService = new UserService(dataAccess);
         authService = new AuthService(dataAccess);
         gameService = new GameService(dataAccess, authService);
+        webSocketHandler = new WebSocketHandler(dataAccess);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
+
+        // WebSocket endpoint for gameplay
+        javalin.ws("/ws", ws -> {
+            ws.onConnect(webSocketHandler::onConnect);
+            ws.onMessage(webSocketHandler::onMessage);
+            ws.onClose(webSocketHandler::onClose);
+            ws.onError(webSocketHandler::onError);
+        });
 
         // clear()
         javalin.delete("/db", ctx -> {
